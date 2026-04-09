@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1614" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>拾光里的留白</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screen-title" class="screen screen--title" aria-label="标题">
+      <div class="title-card">
+        <h1 class="title-card__name">拾光里的留白</h1>
+        <p class="title-card__tag">反套路现实向 · 对话选择</p>
+        <label class="title-card__label">
+          <span>称呼（默认：林野）</span>
+          <input type="text" id="player-name" maxlength="12" placeholder="林野" autocomplete="nickname" />
+        </label>
+        <button type="button" id="btn-start" class="btn btn--primary">开始故事</button>
+        <button type="button" id="btn-continue" class="btn btn--ghost hidden">继续游戏</button>
+        <button type="button" id="btn-title-settings" class="btn btn--ghost">设置</button>
+      </div>
+      <p class="title-hint">插画放在 <code>assets/images/</code>，文件名见 <code>js/data.js</code> 的 <code>SCENE_IMAGE_FILES</code>；音频在 <code>GAME_AUDIO</code> 绑定。<a href="branch-map.html">分支与结局导向图</a></p>
+    </section>
+
+    <section id="screen-game" class="screen screen--game hidden" aria-label="游戏">
+      <div class="game-frame">
+        <header class="game-hud">
+          <div class="hud-brand">拾光里的留白</div>
+          <div class="hud-actions">
+            <button type="button" id="btn-settings" class="btn btn--small" title="设置与存档">设置</button>
+            <button type="button" id="btn-menu" class="btn btn--small">菜单</button>
+          </div>
+        </header>
+
+        <div class="stage">
+          <div class="stage__frame-inner">
+            <div class="stage__visual" id="stage-visual">
+              <img id="stage-img" class="stage__img" src="" alt="" />
+              <div id="stage-placeholder" class="stage__placeholder" aria-hidden="true"></div>
+            </div>
+            <div class="stage__vignette"></div>
+          </div>
+        </div>
+
+        <div class="subtitle" id="scene-badge"></div>
+
+        <div class="dialogue-panel" id="dialogue-panel">
+          <div class="dialogue-panel__speaker" id="dialogue-speaker"></div>
+          <div class="dialogue-panel__body" id="dialogue-body">
+            <p class="dialogue-panel__text" id="dialogue-text"></p>
+            <span class="typing-indicator" id="typing-indicator" aria-hidden="true"></span>
+          </div>
+          <p class="dialogue-panel__hint hidden" id="dialogue-hint">点击画面 · 显示全文</p>
+          <ul class="choices" id="choices"></ul>
+          <button type="button" id="btn-advance" class="btn btn--advance hidden">继续</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-ending" class="screen screen--ending hidden" aria-label="结局">
+      <div class="ending-card">
+        <h2 id="ending-title"></h2>
+        <div id="ending-body" class="ending-card__body"></div>
+        <button type="button" id="btn-replay" class="btn btn--primary">返回标题</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="modal-settings" class="modal hidden" aria-hidden="true">
+    <div class="modal__backdrop" id="modal-settings-backdrop"></div>
+    <div class="modal__panel" role="dialog" aria-labelledby="modal-settings-title">
+      <div class="modal__header">
+        <h2 class="modal__title" id="modal-settings-title">设置</h2>
+        <button type="button" class="modal__close" id="btn-settings-close" aria-label="关闭">×</button>
+      </div>
+      <div class="modal__body">
+        <section class="settings-block">
+          <h3 class="settings-block__title">音频</h3>
+          <label class="settings-row settings-row--check">
+            <input type="checkbox" id="set-bgm-on" checked />
+            <span>开启背景音乐</span>
+          </label>
+          <label class="settings-row">
+            <span class="settings-row__label">音量</span>
+            <input type="range" id="set-bgm-volume" min="0" max="100" value="70" />
+            <span class="settings-row__value" id="set-bgm-volume-val">70%</span>
+          </label>
+        </section>
+        <section class="settings-block">
+          <h3 class="settings-block__title">存档</h3>
+          <p class="settings-hint">剧情会在推进时自动保存为「上次进度」，标题页可点「继续游戏」。下方可新增多个手动存档。</p>
+          <div class="settings-save-new">
+            <input type="text" id="set-save-label" class="settings-input" maxlength="24" placeholder="存档名称（可选）" autocomplete="off" />
+            <button type="button" id="btn-save-new-slot" class="btn btn--settings-action">新建存档</button>
+          </div>
+          <ul class="save-slots" id="save-slots-list"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bgm" loop preload="none" playsinline></audio>
+  <script src="js/data.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>

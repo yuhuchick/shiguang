@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>拾光里的留白 · 分支与结局导向图</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.5/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #1a1614;
+      color: #faf6ef;
+      font-family: "Noto Serif SC", "Songti SC", serif;
+      line-height: 1.6;
+    }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #c9a87a;
+      margin: 0 0 8px;
+    }
+    .note {
+      font-size: 0.85rem;
+      color: rgba(250, 246, 239, 0.65);
+      margin-bottom: 20px;
+      max-width: 900px;
+    }
+    .mermaid {
+      background: #252018;
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+    }
+    .legend {
+      margin-top: 24px;
+      font-size: 0.82rem;
+      color: rgba(250, 246, 239, 0.7);
+      max-width: 900px;
+    }
+    .legend h2 {
+      font-size: 1rem;
+      color: #c9a87a;
+      margin: 16px 0 8px;
+    }
+    ul {
+      padding-left: 1.2em;
+    }
+    a {
+      color: #b8956a;
+    }
+  </style>
+</head>
+<body>
+  <h1>《拾光里的留白》分支与结局导向图</h1>
+  <p class="note">
+    对应 <code>js/data.js</code> 与 <code>js/engine.js</code> 的 <code>resolveEnding</code>。新增「暧昧期」与「主动坦白」节点，秘密值 ≥50 进入「完整真相」，否则为「部分真相」（文案不同，选项相同）。好感/信任/自我/镜像值共同参与结局判定，界面已隐藏数值。
+    <a href="index.html">返回游戏</a>
+  </p>
+
+  <div class="mermaid">
+flowchart TB
+  subgraph SG1["第一幕 初遇"]
+    A0["雨天咖啡馆"] --> A1["递水三选一"]
+    A1 --> A2["看画三选一"]
+    A2 --> A3["伞 要微信或拒伞或只要谢"]
+    A3 -->|拒伞| A4["missed_second"]
+    A3 -->|其他| A5["有伞"]
+    A4 --> GATE["时间跳转"]
+    A5 --> GATE
+  end
+
+  subgraph SG1B["升温前"]
+    GATE -->|拒伞| LATE["深夜外卖线 o6"]
+    GATE -->|正常| SEC["二次相遇 朋友圈 o4"]
+    SEC -->|点赞或私信| DEEP["深聊 o5"]
+    SEC -->|存疑| DOUBT["疑虑 同 o6"]
+    LATE --> LIFT["o7 手机态度"]
+    DEEP --> LIFT
+    DOUBT --> LIFT
+  end
+
+  LIFT -->|偷看| PEEK["窥屏加秘密"]
+  PEEK --> AMB["新增 暧昧拉扯 两个月"]
+  LIFT -->|不偷看| AMB
+
+  subgraph SG2["第二幕 告白"]
+    AMB --> ACT2_IN["一个月后告白"]
+    ACT2_IN --> CF{"告白三选一"}
+    CF -->|A 全接纳| SF["秘密完整倾诉"]
+    CF -->|B 先听再说| SM["秘密有所保留"]
+    CF -->|C 不耐烦| FAIL["告白失败"]
+    SF --> N9
+    SM --> N9
+  end
+
+  subgraph SG3["第三幕入口"]
+    N9["o9 五选一"] -->|A 拥抱| MOTHER["林母饭桌"]
+    N9 -->|B 冷静| CHEN["陈默 o11"]
+    N9 -->|C 介意| SUNIAN["苏念 o12"]
+    N9 -->|D 分手| LEAVE["断联 o13"]
+    N9 -->|E 主动坦白| HERO["男主三层秘密揭露"]
+    HERO --> MOTHER
+    FAIL --> N13
+    MOTHER --> N10["o10 帮不帮苏晚"]
+    CHEN --> N11["o11 听陈默后"]
+    SUNIAN --> N12["o12 对苏念"]
+    LEAVE --> N13["o13 断联后"]
+    N10 --> TRUTH
+    N12 --> TRUTH
+    N11 -->|挽回或再想| TRUTH
+    N11 -->|分手| E_REGRET["结局 遗憾擦肩"]
+    N13 -->|陈默调解| MED["三人调解"]
+    N13 -->|不低头| E_LONELY["结局 孤独"]
+    N13 -->|向前看| E_REL["结局 释然"]
+    MED -->|按台阶走| TRUTH
+    MED -->|查车内笔记| OBS["幕后笔记线"]
+    OBS --> E_OBS["中性 幕后落幕"]
+  end
+
+  subgraph SG4["真相与终局"]
+    TRUTH["truth_gate"] -->|秘密满50| FULL["完整真相"]
+    TRUTH -->|秘密不足50| PART["部分真相"]
+    FULL --> N14["o14 四选一"]
+    PART --> N14
+    N14 -->|A 心疼| POS["复健见闺蜜 o15"]
+    N14 -->|B 再想| TUG["林母拷问 o16"]
+    N14 -->|C 愤怒| E_D1["黑暗1 消耗"]
+    N14 -->|D 假接受| MASK["假面叙事"]
+    POS -->|家乡| E_H["圆满 拾光同行"]
+    POS -->|工作室| E_ST["圆满 温柔相守"]
+    TUG -->|承诺| E_TUG_OK["拉锯 双向奔赴"]
+    TUG -->|犹豫| E_REGRET2["遗憾 擦肩"]
+    TUG -->|听母分| E_D3["黑暗3 自我放弃"]
+    MASK --> E_D2["黑暗2 假面共生"]
+  end
+
+  E_H -.-> E_Hsoft["温和版拾光"]
+  E_ST -.-> E_STsoft["温和版工作室"]
+  MIR["镜像值高且低信任"] -.-> E_D2
+  </div>
+
+  <div class="legend">
+    <h2>结局与引擎判定（摘要）</h2>
+    <ul>
+      <li><strong>圆满·拾光同行</strong>：<code>chose_hometown</code> 且好感/信任/自我达阈值 → 完整文案；否则 → 温和版。</li>
+      <li><strong>圆满·温柔相守</strong>：<code>chose_studio</code>，同上。</li>
+      <li><strong>释然</strong>：<code>path_release</code>，高自我且低好感 → 画展释然；否则 → 各自上路。</li>
+      <li><strong>挽回线</strong>：<code>path_redemption</code>（陈默调解后），按好感/信任分「和解之后 / 仍有余悸」。</li>
+      <li><strong>幕后落幕</strong>：陈默调解后转入「车内笔记」分支，触发 <code>ending_observer</code>。</li>
+      <li><strong>黑暗1/2/3</strong>：对应 <code>ending_dark1/2/3</code> 旗帜。</li>
+      <li><strong>镜像值兜底</strong>：<code>mirror</code> 过高且信任偏低时，即使未手动选黑暗线，也会坠入「黑暗2 假面共生」。</li>
+      <li><strong>遗憾/孤独</strong>：<code>ending_regret_pass</code>、<code>ending_lonely</code>。</li>
+      <li><strong>拉锯</strong>：仅 <code>tug_war</code> 且未选家乡/工作室结局时，<code>tug_commit</code> → 双向奔赴，否则 → 拉锯未完。</li>
+      <li><strong>留白 / 开放式</strong>：未命中以上时按数值落到 <code>end_neutral_warm</code> 或 <code>end_neutral_open</code>。</li>
+    </ul>
+    <h2>已修复的剧本/逻辑问题</h2>
+    <ul>
+      <li>选「工作室/家乡」但数值不足时，原先会落到无关的「留白」结局；已改为<strong>仍进入对应温和版圆满</strong>。</li>
+      <li>「只要谢、未加微信」仍走二次相遇时，原文写「三天后还伞」易矛盾；已改为<strong>「几天后在同店再遇 + 还伞」</strong>并区分是否已加微信的朋友圈描写。</li>
+    </ul>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "dark",
+      themeVariables: {
+        primaryColor: "#3d342c",
+        primaryTextColor: "#faf6ef",
+        lineColor: "#b8956a",
+        secondaryColor: "#2a241f",
+        tertiaryColor: "#1a1614",
+      },
+    });
+  </script>
+</body>
+</html>
