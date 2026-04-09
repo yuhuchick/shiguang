@@ -320,6 +320,7 @@
   function Game() {
     this.state = defaultState();
     this.sceneId = "act1_s1_rain";
+    this.sceneTextIndex = 0;
     this.ended = false;
     this.endingId = null;
     this._twTimer = null;
@@ -334,6 +335,7 @@
     return {
       state: JSON.parse(JSON.stringify(this.state)),
       sceneId: this.sceneId,
+      sceneTextIndex: this.sceneTextIndex | 0,
       ended: !!this.ended,
       endingId: this.endingId || null,
     };
@@ -346,6 +348,7 @@
     if (!this.state.flags) this.state.flags = {};
     if (typeof this.state.mirror !== "number") this.state.mirror = 50;
     this.sceneId = data.sceneId;
+    this.sceneTextIndex = data.sceneTextIndex | 0;
     this.ended = !!data.ended;
     this.endingId = data.endingId || null;
     this._twSessionId = (this._twSessionId | 0) + 1;
@@ -356,6 +359,7 @@
     this.stopTypewriter();
     this.state = defaultState(name);
     this.sceneId = "act1_s1_rain";
+    this.sceneTextIndex = 0;
     this.ended = false;
     this.endingId = null;
     this._twSessionId = 0;
@@ -368,6 +372,7 @@
         JSON.stringify({
           state: this.state,
           sceneId: this.sceneId,
+          sceneTextIndex: this.sceneTextIndex | 0,
           ended: !!this.ended,
           endingId: this.endingId || null,
         })
@@ -396,6 +401,7 @@
       if (!this.state.flags) this.state.flags = {};
       if (typeof this.state.mirror !== "number") this.state.mirror = 50;
       this.sceneId = data.sceneId;
+      this.sceneTextIndex = data.sceneTextIndex | 0;
       this.ended = !!data.ended;
       this.endingId = data.endingId || null;
       return true;
@@ -417,9 +423,21 @@
     var choicesEl = document.getElementById("choices");
     var btnAdvance = document.getElementById("btn-advance");
     var self = this;
+    var textItems = this._renderTextItems || [];
+    var textIdx = this._renderTextIndex | 0;
+    var hasMoreText = textItems.length > 1 && textIdx < textItems.length - 1;
     choicesEl.innerHTML = "";
     btnAdvance.classList.add("hidden");
     btnAdvance.onclick = null;
+    if (hasMoreText) {
+      btnAdvance.classList.remove("hidden");
+      btnAdvance.onclick = function () {
+        self.sceneTextIndex = Math.min(textItems.length - 1, textIdx + 1);
+        self.persist();
+        self.render();
+      };
+      return;
+    }
     if (scene.choices && scene.choices.length) {
       scene.choices.forEach(function (ch) {
         if (ch.showIf && !ch.showIf(st)) return;
@@ -574,6 +592,7 @@
       this.showEnding(endId);
       return;
     }
+    if (this.sceneId !== id) this.sceneTextIndex = 0;
     this.sceneId = id;
     this.persist();
     this.render();
@@ -638,7 +657,22 @@
     btnAdvance.classList.add("hidden");
     btnAdvance.onclick = null;
 
-    var fullText = formatText(scene.text, name);
+    var textItemsRaw = Array.isArray(scene.text) ? scene.text : [scene.text];
+    var textItems = textItemsRaw
+      .map(function (t) {
+        return formatText(t, name);
+      })
+      .filter(function (t) {
+        return t != null;
+      });
+    if (!textItems.length) textItems = [""];
+    var idx = this.sceneTextIndex | 0;
+    if (idx < 0) idx = 0;
+    if (idx >= textItems.length) idx = textItems.length - 1;
+    this.sceneTextIndex = idx;
+    this._renderTextItems = textItems;
+    this._renderTextIndex = idx;
+    var fullText = textItems[idx];
     var hasBody = !!(fullText && String(fullText).trim());
     var useTw = shouldUseTypewriter(scene, hasBody);
 
